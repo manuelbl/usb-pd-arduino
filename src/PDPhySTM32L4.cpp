@@ -60,7 +60,11 @@ static int txBitStreamLength;
 // PA8 can be configured as debug output pin. It indicates certain activities such as
 // ADC conversion complete, comparator interrupt, processing of received data.
 
+#if USBPD_DEBUG_PIN
 static constexpr bool useDebugOut = true;
+#else
+static constexpr bool useDebugOut = false;
+#endif
 static inline void debugOutOn() { if (useDebugOut) gpioSetOutputHigh(GPIOA, 8); }
 static inline void debugOutOff() { if (useDebugOut) gpioSetOutputLow(GPIOA, 8); }
 

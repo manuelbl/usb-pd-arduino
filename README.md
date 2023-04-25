@@ -1,10 +1,8 @@
 # USB Power Delivery for Arduino
 
-Implement a USB PD protocol analyzer, a USB PD trigger board or a more
-sophisticated power sink using with a few additional components and simple
-Arduino code. Supports several STM32 microcontrollers.
+Implement a USB PD protocol analyzer, a USB PD trigger board or a more sophisticated power sink using a few additional components and simple Arduino code. Supports several STM32 microcontrollers.
 
-Dependning on the microcontroller, a comparator and a few resistors are needed, or only resistors or no additional component at all. See below for more details. For 5 USD in parts, you can build a USB PD protocol analyzer.
+Depending on the microcontroller, a comparator and a few resistors are needed, or just the resistors or no additional component at all. See below for more details. For 5 USD in parts, you can build a USB PD protocol analyzer.
 
 
 
@@ -59,8 +57,7 @@ See the Wiki for details regarding the required components and wiring.
 
 ### Trigger Board
 
-The trigger boards communicates with a USB power supply and requests a different voltage than
-the initial 5V.
+The trigger boards communicates with a USB power supply and requests a different voltage than the initial 5V.
 
 ```c++
 #include "PowerDelivery.h"
@@ -77,3 +74,11 @@ void loop() {
 ```
 
 See the Wiki for details regarding the required components and wiring.
+
+
+## Restrictions
+
+- This library uses several peripherals exclusively (e.g. one or two timers and the ADC in many cases). The peripheral can no longer be used by your own code as it would interfer with the operation of this library. Please read to restrictions that apply to your board.
+
+- The USB PD protocol is very timing sensitive. In order to be robust even in the presence of blocking code (e.g. `Serial.println()`), most of the USB PD processing is done in interrupt handlers. While receiving a USB PD message, interrupt handlers can consume up to 40% of the CPU time.
+
