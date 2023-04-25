@@ -11,10 +11,7 @@
 //
 
 #include <Arduino.h>
-#include "TaskScheduler.h"
-#include "ProtocolAnalyzer.h"
 #include "PowerDelivery.h"
-#include "CRC32.h"
 
 static void handleEvent(PDSinkEventType eventType);
 static void switchVoltage();

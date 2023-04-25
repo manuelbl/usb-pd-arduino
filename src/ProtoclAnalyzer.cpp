@@ -105,9 +105,22 @@ static const char* getSOPSequenceName(PDSOPSequence sequence) {
     return SOPSequenceNames[index];
 }
 
+static const char* getSender(const PDMessage* message) {
+    auto seq = message->sopSequence;
+    if (seq == PDSOPSequence::sop) {
+        return (message->header & 0x0100) != 0 ? "Source" : "Sink";
+    } else if (seq == PDSOPSequence::sop1 || seq == PDSOPSequence::sop2) {
+        return (message->header & 0x0100) != 0 ? "Cable" : "Port";
+    }
+
+    return "";
+}
+
 static void printMessage(const PDMessage* message) {
-    Serial.printf("CC%d %-5s %-20s %d  %04x", message->cc, getSOPSequenceName(message->sopSequence),
-            getMessageName(message->type()), message->messageId(), message->header);
+    Serial.printf("CC%d %-5s %-7s %-20s %d  %04x",
+            message->cc, getSOPSequenceName(message->sopSequence),
+            getSender(message),getMessageName(message->type()),
+            message->messageId(), message->header);
     int numObjects = message->numObjects();
     for (int i = 0; i < numObjects; i++)
         Serial.printf(" %08x", message->objects[i]);

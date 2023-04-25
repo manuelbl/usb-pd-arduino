@@ -151,6 +151,7 @@ void PDController::onNoGoodCrcReceived() {
 void PDController::onMessageReceived(PDMessage* message) {
     int messageId = message->messageId();
     PDMessageType type = message->type();
+    PDSOPSequence sopSeq = message->sopSequence;
     bool reportTransmissionFailed = false;
 
     log(PDLogEntryType::messageReceived, message);
@@ -164,7 +165,7 @@ void PDController::onMessageReceived(PDMessage* message) {
 
     if (isTransmitting()) {
         // a GoodCRC message is expected
-        if (type != PDMessageType::controlGoodCrc || messageId != txMessageId) {
+        if (type != PDMessageType::controlGoodCrc || sopSeq != PDSOPSequence::sop || messageId != txMessageId) {
             log(PDLogEntryType::transmissionFailed);
             reportTransmissionFailed = true;
         }
@@ -174,7 +175,7 @@ void PDController::onMessageReceived(PDMessage* message) {
         lastMessage = nullptr;
     }
 
-    if (type != PDMessageType::controlGoodCrc && !isMonitorOnly) {
+    if (type != PDMessageType::controlGoodCrc && sopSeq == PDSOPSequence::sop && !isMonitorOnly) {
 
         // if the message has the same message ID like the previous one,
         // 'lastMessage' is not set to prevent notifying the event handler twice

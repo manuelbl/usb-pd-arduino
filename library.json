@@ -22,13 +22,13 @@
     "examples": [
         {
             "name": "Protocol Analyzer",
-            "base": "pio-examples/ProtocolAnalyzer",
-            "files": [ "platformio.ini", "main.cpp" ]
+            "base": "examples/ProtocolAnalyzer",
+            "files": [ "ProtocolAnalyzer.ino" ]
         },
         {
             "name": "Trigger Board",
-            "base": "pio-examples/TriggerBoard",
-            "files": [ "platformio.ini", "main.cpp" ]
+            "base": "examples/TriggerBoard",
+            "files": [ "TriggerBoard.ino" ]
         }
     ]
   }
