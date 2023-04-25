@@ -1,0 +1,35 @@
+{
+    "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+    "name": "USB-Power-Delivery",
+    "version": "1.0.0",
+    "description": "USB Power Delivery for Arduino projects. Create a USB PD protocol analyzer, trigger board or power sink for no or only few additional components. Supports several STM32 boards.",
+    "keywords": "usb,usb-pd,usb-power-delivery,protocol-analyzer,trigger-board",
+    "homepage": "https://github.com/manuelbl/usb-pd-arduino",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/manuelbl/usb-pd-arduino.git"
+    },
+    "authors": {
+        "name": "Manuel Bl",
+        "email": "manuel.bleichenbacher@gmail.com",
+        "url": "https://github.com/manuelbl/usb-pd-arduino/discussions",
+        "maintainer": true
+    },
+    "license": "MIT",
+    "frameworks": ["arduino"],
+    "platforms": ["ststm32"],
+    "headers": ["PowerDelivery.h", "PDController.h", "PDSink.h", "ProtocolAnalyzer.h"],
+    "examples": [
+        {
+            "name": "Protocol Analyzer",
+            "base": "pio-examples/ProtocolAnalyzer",
+            "files": [ "platformio.ini", "main.cpp" ]
+        },
+        {
+            "name": "Trigger Board",
+            "base": "pio-examples/TriggerBoard",
+            "files": [ "platformio.ini", "main.cpp" ]
+        }
+    ]
+  }
+  
