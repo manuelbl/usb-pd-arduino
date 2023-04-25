@@ -7,7 +7,7 @@
 //
 
 #include <Arduino.h>
-#include "ProtocolAnalyzer.h"
+#include "USBPDProtocolAnalyzer.h"
 #include "PDSourceCapability.h"
 #include "PDController.h"
 
@@ -126,7 +126,7 @@ static void printMessage(const PDMessage* message) {
         Serial.printf(" %08x", message->objects[i]);
 }
 
-void ProtocolAnalyzer::poll() {
+void USBPDProtocolAnalyzer::poll() {
     auto logEntry = PowerController.popLogEntry();
     if (logEntry == nullptr)
         return;

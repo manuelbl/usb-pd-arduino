@@ -39,7 +39,7 @@ See the Wiki for how to wire the board and the additional components.
 The protocol analyzer can be connected between two USB PD devices to monitor the USB PD communication.
 
 ```c++
-#include "PowerDelivery.h"
+#include "USBPowerDelivery.h"
 
 void setup() {
   Serial.begin(115200);
@@ -47,7 +47,7 @@ void setup() {
 }
 
 void loop() {
-  ProtocolAnalyzer::poll();
+  USBPDProtocolAnalyzer::poll();
 }
 ```
 
@@ -60,7 +60,7 @@ See the Wiki for details regarding the required components and wiring.
 The trigger boards communicates with a USB power supply and requests a different voltage than the initial 5V.
 
 ```c++
-#include "PowerDelivery.h"
+#include "USBPowerDelivery.h"
 
 void setup() {
   PowerSink.start();

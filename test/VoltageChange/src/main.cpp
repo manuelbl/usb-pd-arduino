@@ -11,7 +11,7 @@
 //
 
 #include <Arduino.h>
-#include "PowerDelivery.h"
+#include "USBPowerDelivery.h"
 
 static void handleEvent(PDSinkEventType eventType);
 static void switchVoltage();
@@ -30,7 +30,7 @@ void setup() {
 
 void loop() {
     PowerSink.poll();
-    ProtocolAnalyzer::poll();
+    USBPDProtocolAnalyzer::poll();
 
     if (isUSBPDSource && hasExpired(nextVoltageChangeTime))
         switchVoltage();

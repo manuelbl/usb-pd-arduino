@@ -11,7 +11,7 @@
 //
 
 #include <Arduino.h>
-#include "PowerDelivery.h"
+#include "USBPowerDelivery.h"
 
 void setup() {
   Serial.begin(115200);
@@ -19,5 +19,5 @@ void setup() {
 }
 
 void loop() {
-  ProtocolAnalyzer::poll();
+  USBPDProtocolAnalyzer::poll();
 }

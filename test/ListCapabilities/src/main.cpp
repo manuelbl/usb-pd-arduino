@@ -11,7 +11,7 @@
 //
 
 #include <Arduino.h>
-#include "PowerDelivery.h"
+#include "USBPowerDelivery.h"
 
 static void handleEvent(PDSinkEventType eventType);
 static void listCapabilities();
