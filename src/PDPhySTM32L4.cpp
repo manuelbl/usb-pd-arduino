@@ -534,8 +534,6 @@ int PDPhySTM32L4::decodeChunk(int currentIndex) {
 void PDPhySTM32L4::initTx() {
     // enable clock for SPI1
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-    // enable clock for DMA2
-    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
     // enable clock for GPIOA and GPIOB
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN;
 
