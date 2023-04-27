@@ -6,5 +6,5 @@ void setup() {
 }
 
 void loop() {
-  ProtocolAnalyzer::poll();
+  PDProtocolAnalyzer.poll();
 }

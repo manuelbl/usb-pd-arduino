@@ -30,7 +30,7 @@ void setup() {
 
 void loop() {
     PowerSink.poll();
-    USBPDProtocolAnalyzer::poll();
+    PDProtocolAnalyzer::poll();
 
     if (isUSBPDSource && hasExpired(nextVoltageChangeTime))
         switchVoltage();

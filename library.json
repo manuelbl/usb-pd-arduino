@@ -18,7 +18,7 @@
     "license": "MIT",
     "frameworks": ["arduino"],
     "platforms": ["ststm32"],
-    "headers": ["USBPowerDelivery.h", "PDController.h", "PDSink.h", "USBPDProtocolAnalyzer.h"],
+    "headers": ["USBPowerDelivery.h", "PDController.h", "PDSink.h", "PDProtocolAnalyzer.h"],
     "examples": [
         {
             "name": "Protocol Analyzer",

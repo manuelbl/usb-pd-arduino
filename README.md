@@ -47,7 +47,7 @@ void setup() {
 }
 
 void loop() {
-  USBPDProtocolAnalyzer::poll();
+  PDProtocolAnalyzer.poll();
 }
 ```
 

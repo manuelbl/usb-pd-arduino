@@ -14,4 +14,4 @@
 
 #include "PDController.h"
 #include "PDSink.h"
-#include "USBPDProtocolAnalyzer.h"
+#include "PDProtocolAnalyzer.h"
