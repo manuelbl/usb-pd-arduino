@@ -8,7 +8,7 @@
 
 #pragma once
 
-#if defined(STM32G431xx)
+#if defined(STM32G431xx) || defined(STM32G474xx)
 
 #include "PDPhy.h"
 
