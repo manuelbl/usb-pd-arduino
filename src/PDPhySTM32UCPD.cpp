@@ -219,8 +219,7 @@ void PDPhySTM32UCPD::handleInterrupt() {
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
         if ((status & UCPD_SR_RXERR) == 0) {
             uint32_t orderedSet = LL_UCPD_ReadRxOrderSet(UCPD1);
-            rxMessage->sopSequence = orderedSet <= LL_UCPD_ORDERED_SET_SOP2_DEBUG
-                ? static_cast<PDSOPSequence>(orderedSet) : PDSOPSequence::cableReset;
+            rxMessage->sopSequence = mapSOPSequence(orderedSet);
             rxMessage->cc = ccActive;
             PowerController.onMessageReceived(rxMessage);
 
@@ -248,6 +247,25 @@ void PDPhySTM32UCPD::handleInterrupt() {
         LL_UCPD_ClearFlag_TxMSGDISC(UCPD1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
         PowerController.onMessageTransmitted(false);
+    }
+}
+
+PDSOPSequence PDPhySTM32UCPD::mapSOPSequence(uint32_t orderedSet) {
+    switch (orderedSet) {
+    case LL_UCPD_RXORDSET_SOP:
+        return PDSOPSequence::sop;
+    case LL_UCPD_RXORDSET_SOP1:
+        return PDSOPSequence::sop1;
+    case LL_UCPD_RXORDSET_SOP2:
+        return PDSOPSequence::sop2;
+    case LL_UCPD_RXORDSET_SOP1_DEBUG:
+        return PDSOPSequence::sop1Debug;
+    case LL_UCPD_RXORDSET_SOP2_DEBUG:
+        return PDSOPSequence::sop2Debug;
+    case LL_UCPD_RXORDSET_CABLE_RESET:
+        return PDSOPSequence::cableReset;
+    default:
+        return PDSOPSequence::invalid;
     }
 }
 

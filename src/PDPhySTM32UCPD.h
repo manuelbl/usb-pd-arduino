@@ -24,6 +24,7 @@ private:
     static void enableCommunication(int cc);
     static void disableCommunication();
     static void enableRead();
+    static PDSOPSequence mapSOPSequence(uint32_t orderedSet);
 
     static void handleInterrupt();
 
