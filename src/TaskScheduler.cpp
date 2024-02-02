@@ -15,7 +15,7 @@
 // must be used for the interrupt handler. Otherwise, the linker will encounter
 // duplicate symbols.
 
-#if defined(STM32L4xx) || defined(STM32G431xx)
+#if defined(STM32L4xx) || defined(STM32G431xx) || defined(STM32G474xx)
 #define TIMER TIM7
 #elif defined(STM32F103xB) || defined(STM32F4xx)
 #define TIMER TIM3

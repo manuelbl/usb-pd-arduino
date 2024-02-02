@@ -14,6 +14,7 @@ Depending on the microcontroller, a comparator and a few resistors are needed, o
 | Black Pill (STM32F401CC) | Dual comparator, several resistors |
 | Nucleo-L432KC | Several resistors (for power sink) or none (for protocol analyzer) |
 | Nucleo-G431KB | None |
+| Nucleo-G474RE | None |
 
 All boards require an additional USB C connector as the standard connector is not ready for USB Power Delivery (no USB C connector, CC1/CC2 signals not available, voltage regular cannot handle more than 5V).
 

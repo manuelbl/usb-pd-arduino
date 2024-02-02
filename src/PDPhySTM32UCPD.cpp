@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 
-#if defined(STM32G431xx)
+#if defined(STM32G431xx) || defined(STM32G474xx) || defined(STM32G491xx)
 
 #include <Arduino.h>
 #include "stm32yyxx_ll_bus.h"
@@ -35,13 +35,20 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);
 
+    // configure pins (CC1 -> PB6, CC2 -> PB4)
+    #if defined(ARDUINO_NUCLEO_G431KB)
+    pinMode(D12, INPUT_ANALOG);
+    pinMode(D6, INPUT_ANALOG);
+    #elif defined(ARDUINO_NUCLEO_G431RB) || defined(ARDUINO_NUCLEO_G474RE) || defined(ARDUINO_NUCLEO_G491RE)
+    pinMode(D10, INPUT_ANALOG);
+    pinMode(D5, INPUT_ANALOG);
+    #endif
+
     // initialize UCPD1
     LL_UCPD_InitTypeDef ucpdInit = {0};
     LL_UCPD_StructInit(&ucpdInit);
     LL_UCPD_Init(UCPD1, &ucpdInit);
 
-    // configure pins (CC1 -> PB6, CC2 -> PB4)
-    pinMode(D12, INPUT_ANALOG);
     LL_GPIO_InitTypeDef pb4Init = {
         .Pin = LL_GPIO_PIN_4,
         .Mode = LL_GPIO_MODE_ANALOG,
@@ -49,7 +56,6 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     };
     LL_GPIO_Init(GPIOB, &pb4Init);
 
-    pinMode(D6, INPUT_ANALOG);
     LL_GPIO_InitTypeDef pb6Init = {
         .Pin = LL_GPIO_PIN_6,
         .Mode = LL_GPIO_MODE_ANALOG,
