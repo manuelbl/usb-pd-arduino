@@ -14,6 +14,8 @@
 #include "stm32f401xc.h"
 #elif defined(STM32L4xx)
 #include "stm32l4xx.h"
+#elif defined(STM32G071xx)
+#include "stm32g071xx.h"
 #elif defined(STM32G431xx)
 #include "stm32g431xx.h"
 #elif defined(STM32G474xx)
@@ -21,7 +23,7 @@
 #elif defined(STM32G491xx)
 #include "stm32g491xx.h"
 #else
-#pragma GCC error "This board is not supported by usb-pd-arduino. Supported boards: STM32F103xB (aka Bluepill), STM32F401xC (aka Blackpill), STM32L4 family, STM32G431, STM32G474."
+#pragma GCC error "This board is not supported by usb-pd-arduino. Supported boards: STM32F103xB (aka Bluepill), STM32F401xC (aka Blackpill), STM32L4 family, STM32G071, STM32G431, STM32G474."
 #endif
 
 // --- Register manipulation ---

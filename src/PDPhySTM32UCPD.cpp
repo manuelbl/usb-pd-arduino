@@ -6,15 +6,59 @@
 // https://opensource.org/licenses/MIT
 //
 
-#if defined(STM32G431xx) || defined(STM32G474xx) || defined(STM32G491xx)
+#if defined(STM32G0xx) || defined(STM32G4xx)
 
 #include <Arduino.h>
 #include "stm32yyxx_ll_bus.h"
 #include "stm32yyxx_ll_dma.h"
 #include "stm32yyxx_ll_pwr.h"
 #include "stm32yyxx_ll_ucpd.h"
+#include "stm32yyxx_ll_system.h"
 #include "PDController.h"
 #include "PDPhySTM32UCPD.h"
+
+#if defined(STM32G4xx)
+    // STM32G4 family: CC1 -> PB6, CC2 -> PB4
+    #define GPIO_CC1 GPIOB
+    #define PIN_CC1 LL_GPIO_PIN_6
+    #define GPIO_CC2 GPIOB
+    #define PIN_CC2 LL_GPIO_PIN_4
+    #define DMA_RX DMA1
+    #define DMA_CHANNEL_RX LL_DMA_CHANNEL_1
+    #define DMA_TX DMA1
+    #define DMA_CHANNEL_TX LL_DMA_CHANNEL_2
+    #define UCPD_IRQ UCPD1_IRQn
+
+    #if defined(ARDUINO_NUCLEO_G431KB)
+        #define PIN_CC1_ARDUINO D12
+        #define PIN_CC2_ARDUINO D6
+    #elif defined(ARDUINO_NUCLEO_G431RB) || defined(ARDUINO_NUCLEO_G474RE) || defined(ARDUINO_NUCLEO_G491RE)
+        #define PIN_CC1_ARDUINO D10
+        #define PIN_CC2_ARDUINO D5
+    #else
+    #endif
+
+#elif defined(STM32G0xx)
+    // STM32G0 family: CC1 -> PA8, CC2 -> PB15
+    #define GPIO_CC1 GPIOA
+    #define PIN_CC1 LL_GPIO_PIN_8
+    #define GPIO_CC2 GPIOB
+    #define PIN_CC2 LL_GPIO_PIN_15
+    #define DMA_RX DMA1
+    #define DMA_CHANNEL_RX LL_DMA_CHANNEL_1
+    #define DMA_TX DMA1
+    #define DMA_CHANNEL_TX LL_DMA_CHANNEL_2
+    #define UCPD_IRQ UCPD1_2_IRQn
+
+    #if defined(ARDUINO_NUCLEO_G071RB)
+        #define PIN_CC1_ARDUINO D7
+        #define PIN_CC2_ARDUINO D47
+    #endif
+#endif
+#if !defined(PIN_CC1_ARDUINO) || !defined(PIN_CC2_ARDUINO)
+    #error "Arduiono board not yet supported - please define PIN_CC1_ARDUINO and PIN_CC2_ARDUINO"
+#endif
+
 
 static PDMessage* rxMessage;
 static int ccActive;
@@ -33,35 +77,35 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);
-
-    // configure pins (CC1 -> PB6, CC2 -> PB4)
-    #if defined(ARDUINO_NUCLEO_G431KB)
-    pinMode(D12, INPUT_ANALOG);
-    pinMode(D6, INPUT_ANALOG);
-    #elif defined(ARDUINO_NUCLEO_G431RB) || defined(ARDUINO_NUCLEO_G474RE) || defined(ARDUINO_NUCLEO_G491RE)
-    pinMode(D10, INPUT_ANALOG);
-    pinMode(D5, INPUT_ANALOG);
+    #if defined(STM32G4xx)
+        LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);
+    #else
+        LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
     #endif
+
+    // Use Arduino function for basic pin configuration so the Arduino library is aware
+    // if the most important settings (such as GPIO clock initialization).
+    pinMode(PIN_CC1_ARDUINO, INPUT_ANALOG);
+    pinMode(PIN_CC2_ARDUINO, INPUT_ANALOG);
 
     // initialize UCPD1
     LL_UCPD_InitTypeDef ucpdInit = {0};
     LL_UCPD_StructInit(&ucpdInit);
     LL_UCPD_Init(UCPD1, &ucpdInit);
 
-    LL_GPIO_InitTypeDef pb4Init = {
-        .Pin = LL_GPIO_PIN_4,
+    LL_GPIO_InitTypeDef pinCc1Init = {
+        .Pin = PIN_CC1,
         .Mode = LL_GPIO_MODE_ANALOG,
         .Pull = LL_GPIO_PULL_NO
     };
-    LL_GPIO_Init(GPIOB, &pb4Init);
+    LL_GPIO_Init(GPIO_CC1, &pinCc1Init);
 
-    LL_GPIO_InitTypeDef pb6Init = {
-        .Pin = LL_GPIO_PIN_6,
+    LL_GPIO_InitTypeDef pinCc2Init = {
+        .Pin = PIN_CC2,
         .Mode = LL_GPIO_MODE_ANALOG,
         .Pull = LL_GPIO_PULL_NO
     };
-    LL_GPIO_Init(GPIOB, &pb6Init);
+    LL_GPIO_Init(GPIO_CC2, &pinCc2Init);
 
     // configure DMA for USB PD RX
     LL_DMA_InitTypeDef rxDmaInit = {
@@ -75,7 +119,7 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
         .PeriphRequest = LL_DMAMUX_REQ_UCPD1_RX,
         .Priority = LL_DMA_PRIORITY_LOW
     };
-    LL_DMA_Init(DMA1, LL_DMA_CHANNEL_1, &rxDmaInit);
+    LL_DMA_Init(DMA_RX, DMA_CHANNEL_RX, &rxDmaInit);
 
     if (!isMonitor) {
         // configure DMA for USB PD TX
@@ -90,11 +134,13 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
             .PeriphRequest = LL_DMAMUX_REQ_UCPD1_TX,
             .Priority = LL_DMA_PRIORITY_LOW
         };
-        LL_DMA_Init(DMA1, LL_DMA_CHANNEL_2, &txDmaInit);
+        LL_DMA_Init(DMA_TX, DMA_CHANNEL_TX, &txDmaInit);
     }
 
-    // turn off dead battery detection
-    LL_PWR_DisableUCPDDeadBattery();
+    #if defined(STM32G4xx)
+        // turn off dead battery detection
+        LL_PWR_DisableUCPDDeadBattery();
+    #endif
 
     // configure ordered sets
     LL_UCPD_SetRxOrderSet(UCPD1, LL_UCPD_ORDERSET_SOP | LL_UCPD_ORDERSET_SOP1 | LL_UCPD_ORDERSET_SOP2 |
@@ -111,6 +157,11 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     LL_UCPD_SetSNKRole(UCPD1);
     LL_UCPD_SetRpResistor(UCPD1, isMonitor ? LL_UCPD_RESISTOR_DEFAULT : LL_UCPD_RESISTOR_NONE);
     LL_UCPD_SetccEnable(UCPD1, LL_UCPD_CCENABLE_CC1CC2);
+    #if defined(STM32G0xx)
+        if (!isMonitor) {
+            LL_SYSCFG_DisableDBATT(LL_SYSCFG_UCPD1_STROBE);
+        }
+    #endif
 
     // enable DMA
     LL_UCPD_RxDMAEnable(UCPD1);
@@ -118,9 +169,9 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
         LL_UCPD_TxDMAEnable(UCPD1);
 
     // same interrupt priority as timer 7 so they don't interrupt each other (code is not re-entrant)
-    NVIC_SetPriority(UCPD1_IRQn, NVIC_GetPriority(TIM7_IRQn));
+    NVIC_SetPriority(UCPD_IRQ, NVIC_GetPriority(TIM7_IRQn));
     // enable interrupt handler
-    NVIC_EnableIRQ(UCPD1_IRQn);
+    NVIC_EnableIRQ(UCPD_IRQ);
 }
 
 void PDPhy::prepareRead(PDMessage* msg) {
@@ -131,17 +182,17 @@ void PDPhy::prepareRead(PDMessage* msg) {
 
 void PDPhySTM32UCPD::enableRead() {
     // enable RX DMA
-    LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_1, reinterpret_cast<uint32_t>(&rxMessage->header));
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 30);
+    LL_DMA_SetMemoryAddress(DMA_RX, DMA_CHANNEL_RX, reinterpret_cast<uint32_t>(&rxMessage->header));
+    LL_DMA_SetDataLength(DMA_RX, DMA_CHANNEL_RX, 30);
     LL_UCPD_RxEnable(UCPD1);
-    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
+    LL_DMA_EnableChannel(DMA_RX, DMA_CHANNEL_RX);
 }
 
 bool PDPhy::transmitMessage(const PDMessage* msg) {
     // configure DMA request
-    LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_2, reinterpret_cast<uint32_t>(&msg->header));
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, msg->payloadSize());
-    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
+    LL_DMA_SetMemoryAddress(DMA_TX, DMA_CHANNEL_TX, reinterpret_cast<uint32_t>(&msg->header));
+    LL_DMA_SetDataLength(DMA_TX, DMA_CHANNEL_TX, msg->payloadSize());
+    LL_DMA_EnableChannel(DMA_TX, DMA_CHANNEL_TX);
 
     // start transmitting
     LL_UCPD_WriteTxOrderSet(UCPD1, LL_UCPD_ORDERED_SET_SOP);
@@ -168,11 +219,11 @@ void PDPhySTM32UCPD::enableCommunication(int cc) {
 void PDPhySTM32UCPD::disableCommunication() {
 
     // cancel read
-    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
+    LL_DMA_DisableChannel(DMA_RX, DMA_CHANNEL_RX);
     LL_UCPD_RxDisable(UCPD1);
 
     // cancel transmit
-    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+    LL_DMA_DisableChannel(DMA_TX, DMA_CHANNEL_TX);
 
     // disable interrupts
     LL_UCPD_DisableIT_RxMsgEnd(UCPD1);
@@ -184,6 +235,10 @@ void PDPhySTM32UCPD::disableCommunication() {
 
 // interrupt handler
 extern "C" void UCPD1_IRQHandler() {
+    PDPhySTM32UCPD::handleInterrupt();
+}
+
+extern "C" void UCPD1_2_IRQHandler() {
     PDPhySTM32UCPD::handleInterrupt();
 }
 
@@ -222,7 +277,7 @@ void PDPhySTM32UCPD::handleInterrupt() {
     // message received
     if ((status & UCPD_SR_RXMSGEND) != 0) {
         LL_UCPD_ClearFlag_RxMsgEnd(UCPD1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
+        LL_DMA_DisableChannel(DMA_RX, DMA_CHANNEL_RX);
         if ((status & UCPD_SR_RXERR) == 0) {
             uint32_t orderedSet = LL_UCPD_ReadRxOrderSet(UCPD1);
             rxMessage->sopSequence = mapSOPSequence(orderedSet);
@@ -237,21 +292,21 @@ void PDPhySTM32UCPD::handleInterrupt() {
     // message sent
     if ((status & UCPD_SR_TXMSGSENT) != 0) {
         LL_UCPD_ClearFlag_TxMSGSENT(UCPD1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+        LL_DMA_DisableChannel(DMA_TX, DMA_CHANNEL_TX);
         PowerController.onMessageTransmitted(true);
     }
 
     // message aborted
     if ((status & UCPD_SR_TXMSGABT) != 0) {
         LL_UCPD_ClearFlag_TxMSGABT(UCPD1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+        LL_DMA_DisableChannel(DMA_TX, DMA_CHANNEL_TX);
         PowerController.onMessageTransmitted(false);
     }
 
     // message discarded
     if ((status & UCPD_SR_TXMSGDISC) != 0) {
         LL_UCPD_ClearFlag_TxMSGDISC(UCPD1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+        LL_DMA_DisableChannel(DMA_TX, DMA_CHANNEL_TX);
         PowerController.onMessageTransmitted(false);
     }
 }

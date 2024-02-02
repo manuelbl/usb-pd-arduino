@@ -13,6 +13,7 @@ Depending on the microcontroller, a comparator and a few resistors are needed, o
 | Blue Pill (STM32F103C8) | Dual comparator, several resistors |
 | Black Pill (STM32F401CC) | Dual comparator, several resistors |
 | Nucleo-L432KC | Several resistors (for power sink) or none (for protocol analyzer) |
+| Nucleo-G071RB | None |
 | Nucleo-G431KB | None |
 | Nucleo-G474RE | None |
 

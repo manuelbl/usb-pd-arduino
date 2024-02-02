@@ -8,11 +8,12 @@
 
 #pragma once
 
-#if defined(STM32G431xx) || defined(STM32G474xx)
+#if defined(STM32G0xx) || defined(STM32G4xx)
 
 #include "PDPhy.h"
 
 extern "C" void UCPD1_IRQHandler();
+extern "C" void UCPD1_2_IRQHandler();
 
 /**
  * @brief Physical layer for USB PD communication.
@@ -30,6 +31,7 @@ private:
 
     friend class PDPhy;
     friend void UCPD1_IRQHandler();
+    friend void UCPD1_2_IRQHandler();
 };
 
 #endif

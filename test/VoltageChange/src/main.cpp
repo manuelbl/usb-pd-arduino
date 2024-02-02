@@ -23,9 +23,12 @@ static int voltageIndex = 0;
 
 void setup() {
     Serial.begin(115200);
+    while (!Serial)
+        delay(10);
+    Serial.println("USB BP for Arduino - Volatage Change Test");
+
     PowerSink.start(handleEvent);
     Serial.println();
-    Serial.println("USB Power Delivery");
 }
 
 void loop() {

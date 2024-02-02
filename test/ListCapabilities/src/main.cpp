@@ -19,6 +19,9 @@ static const char* getSupplyTypeName(PDSupplyType type);
 
 void setup() {
     Serial.begin(115200);
+    while (!Serial)
+        delay(10);
+    Serial.println("USB BP for Arduino - List Capabilities");
     PowerSink.start(handleEvent);
 }
 
