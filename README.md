@@ -18,6 +18,7 @@ Depending on the microcontroller, a comparator and a few resistors are needed, o
 | Nucleo-G474RE | None |
 
 All boards require an additional USB C connector as the standard connector is not ready for USB Power Delivery (no USB C connector, CC1/CC2 signals not available, voltage regular cannot handle more than 5V).
+For the Nucelo boards in Nucleo-64 form factor, the X-NUCLEO-SNK1M1 shield can be used.
 
 See the Wiki for how to wire the board and the additional components.
 

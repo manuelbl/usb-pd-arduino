@@ -172,6 +172,25 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     NVIC_SetPriority(UCPD_IRQ, NVIC_GetPriority(TIM7_IRQn));
     // enable interrupt handler
     NVIC_EnableIRQ(UCPD_IRQ);
+
+    // Settings for X-NUCLEO-SNK1M1 shield
+    #if defined(SNK1M1_SHIELD)
+        #if defined(ARDUINO_NUCLEO_G474RE)
+            // Pin PB1: DB_OUT -> PIN_A9
+            // Pin PC10: VCC_OUT -> 16
+            pinMode(PIN_A9, OUTPUT);
+            digitalWrite(PIN_A9, HIGH);
+            pinMode(16, OUTPUT);
+            digitalWrite(16, HIGH);
+        #elif defined(ARDUINO_NUCLEO_G071RB)
+            // Pin PB6: DB_OUT -> 46
+            // Pin PC10: VCC_OUT -> 16
+            pinMode(46, OUTPUT);
+            digitalWrite(46, HIGH);
+            pinMode(16, OUTPUT);
+            digitalWrite(16, HIGH);
+        #endif
+    #endif
 }
 
 void PDPhy::prepareRead(PDMessage* msg) {

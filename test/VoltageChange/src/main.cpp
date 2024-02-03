@@ -66,7 +66,7 @@ void handleEvent(PDSinkEventType eventType) {
         break;
 
     case PDSinkEventType::voltageChanged:
-        Serial.printf("Voltage changd: %5dmV  %5dmA (max)", PowerSink.activeVoltage, PowerSink.activeCurrent);
+        Serial.printf("Voltage changed: %5dmV  %5dmA (max)", PowerSink.activeVoltage, PowerSink.activeCurrent);
         Serial.println();
         break;
 
