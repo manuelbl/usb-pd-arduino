@@ -21,8 +21,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install arduino-cli
         run: curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
-      - name: Install core
-        run: arduino-cli core install STMicroelectronics:stm32
+      - name: Install STM32 core
+        run: arduino-cli core install STMicroelectronics:stm32 --additional-urls 'https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json'
       - name: Build ProtocolAnalyzer
         run: arduino-cli compile --library . --warnings all -b ${{ matrix.board }} --board-options "${{ matrix.board_options }}" examples/ProtocolAnalyzer/ProtocolAnalyzer.ino
       - name: Build ListCapabilities
