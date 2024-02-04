@@ -1,0 +1,33 @@
+name: Arduino Builds
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - board: STMicroelectronics:stm32:Nucleo_32
+            board_options: pnum=NUCLEO_G431KB
+          - board: STMicroelectronics:stm32:Nucleo_64
+            board_options: pnum=NUCLEO_G071RB
+          - board: STMicroelectronics:stm32:Nucleo_64
+            board_options: pnum=NUCLEO_G474RE
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install arduino-cli
+        run: curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
+      - name: Install core
+        run: arduino-cli core install STMicroelectronics:stm32
+      - name: Build ProtocolAnalyzer
+        run: arduino-cli compile --library . --warnings all -b ${{ matrix.board }} --board-options "${{ matrix.board_options }}" examples/ProtocolAnalyzer/ProtocolAnalyzer.ino
+      - name: Build ListCapabilities
+        run: arduino-cli compile --library . --warnings all -b ${{ matrix.board }} --board-options "${{ matrix.board_options }}" examples/ListCapabilities/ListCapabilities.ino
+      - name: Build TriggerBoard
+        run: arduino-cli compile --library . --warnings all -b ${{ matrix.board }} --board-options "${{ matrix.board_options }}" examples/TriggerBoard/TriggerBoard.ino
+      - name: Build TriggerBoardAdvanced
+        run: arduino-cli compile --library . --warnings all -b ${{ matrix.board }} --board-options "${{ matrix.board_options }}" examples/TriggerBoardAdvanced/TriggerBoardAdvanced.ino
