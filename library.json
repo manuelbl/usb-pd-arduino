@@ -40,6 +40,14 @@
             "base": "examples/ListCapabilities",
             "files": [ "ListCapabilities.ino" ]
         }
-    ]
-  }
+    ],
+    "export": {
+        "exclude": [
+            ".gitignore",
+            ".github",
+            "*/*/.gitignore",
+            "*/*/.vscode"
+        ]
+    }
+}
   
