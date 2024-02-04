@@ -20,6 +20,9 @@
 void setup() {
   Serial.begin(115200);
   PowerController.startMonitor();
+
+  // Uncomment if using X-NUCLEO-SNK1MK1 shield
+  // NucleoSNK1MK1.init();
 }
 
 void loop() {

@@ -193,7 +193,6 @@ void USBPDProtocolAnalyzer::printCapabilitiesDetails(const PDMessage* message) {
 }
 
 void USBPDProtocolAnalyzer::printRequestDetails(const PDMessage* message) {
-    auto header = message->header;
     auto object = message->objects[0];
     int objPos = (object >> 28) & 0x07;
     bool giveBack = (object & (1 << 27)) != 0;

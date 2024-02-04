@@ -395,6 +395,8 @@ void PDPhySTM32F1::processData() {
                 case PDMessageDecoder::Result::cableReset:
                     PowerController.onReset(PDSOPSequence::cableReset);
                     break;
+                default:
+                    break;
             }
 
             if (isTransmitting) {

@@ -28,7 +28,10 @@ void setup() {
     Serial.println("USB BP for Arduino - Volatage Change Test");
 
     PowerSink.start(handleEvent);
-    Serial.println();
+
+    #if defined(SNK1M1_SHIELD)
+        NucleoSNK1MK1.init();
+    #endif
 }
 
 void loop() {

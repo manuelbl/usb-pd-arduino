@@ -89,35 +89,43 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     pinMode(PIN_CC2_ARDUINO, INPUT_ANALOG);
 
     // initialize UCPD1
-    LL_UCPD_InitTypeDef ucpdInit = {0};
+    LL_UCPD_InitTypeDef ucpdInit = {};
     LL_UCPD_StructInit(&ucpdInit);
     LL_UCPD_Init(UCPD1, &ucpdInit);
 
     LL_GPIO_InitTypeDef pinCc1Init = {
         .Pin = PIN_CC1,
         .Mode = LL_GPIO_MODE_ANALOG,
-        .Pull = LL_GPIO_PULL_NO
+        .Speed = LL_GPIO_SPEED_FREQ_LOW,
+        .OutputType = LL_GPIO_OUTPUT_OPENDRAIN,
+        .Pull = LL_GPIO_PULL_NO,
+        .Alternate = LL_GPIO_AF_0,
     };
     LL_GPIO_Init(GPIO_CC1, &pinCc1Init);
 
     LL_GPIO_InitTypeDef pinCc2Init = {
         .Pin = PIN_CC2,
         .Mode = LL_GPIO_MODE_ANALOG,
-        .Pull = LL_GPIO_PULL_NO
+        .Speed = LL_GPIO_SPEED_FREQ_LOW,
+        .OutputType = LL_GPIO_OUTPUT_OPENDRAIN,
+        .Pull = LL_GPIO_PULL_NO,
+        .Alternate = LL_GPIO_AF_0,
     };
     LL_GPIO_Init(GPIO_CC2, &pinCc2Init);
 
     // configure DMA for USB PD RX
     LL_DMA_InitTypeDef rxDmaInit = {
         .PeriphOrM2MSrcAddress = (uint32_t)&UCPD1->RXDR,
+        .MemoryOrM2MDstAddress = 0,
         .Direction = LL_DMA_DIRECTION_PERIPH_TO_MEMORY,
         .Mode = LL_DMA_MODE_NORMAL,
         .PeriphOrM2MSrcIncMode = LL_DMA_PERIPH_NOINCREMENT,
         .MemoryOrM2MDstIncMode = LL_DMA_MEMORY_INCREMENT,
         .PeriphOrM2MSrcDataSize = LL_DMA_PDATAALIGN_BYTE,
         .MemoryOrM2MDstDataSize = LL_DMA_MDATAALIGN_BYTE,
+        .NbData = 0,
         .PeriphRequest = LL_DMAMUX_REQ_UCPD1_RX,
-        .Priority = LL_DMA_PRIORITY_LOW
+        .Priority = LL_DMA_PRIORITY_LOW,
     };
     LL_DMA_Init(DMA_RX, DMA_CHANNEL_RX, &rxDmaInit);
 
@@ -125,12 +133,14 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
         // configure DMA for USB PD TX
         LL_DMA_InitTypeDef txDmaInit = {
             .PeriphOrM2MSrcAddress = (uint32_t)&UCPD1->TXDR,
+            .MemoryOrM2MDstAddress = 0,
             .Direction = LL_DMA_DIRECTION_MEMORY_TO_PERIPH,
             .Mode = LL_DMA_MODE_NORMAL,
             .PeriphOrM2MSrcIncMode = LL_DMA_PERIPH_NOINCREMENT,
             .MemoryOrM2MDstIncMode = LL_DMA_MEMORY_INCREMENT,
             .PeriphOrM2MSrcDataSize = LL_DMA_PDATAALIGN_BYTE,
             .MemoryOrM2MDstDataSize = LL_DMA_MDATAALIGN_BYTE,
+            .NbData = 0,
             .PeriphRequest = LL_DMAMUX_REQ_UCPD1_TX,
             .Priority = LL_DMA_PRIORITY_LOW
         };
@@ -172,25 +182,6 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
     NVIC_SetPriority(UCPD_IRQ, NVIC_GetPriority(TIM7_IRQn));
     // enable interrupt handler
     NVIC_EnableIRQ(UCPD_IRQ);
-
-    // Settings for X-NUCLEO-SNK1M1 shield
-    #if defined(SNK1M1_SHIELD)
-        #if defined(ARDUINO_NUCLEO_G474RE)
-            // Pin PB1: DB_OUT -> PIN_A9
-            // Pin PC10: VCC_OUT -> 16
-            pinMode(PIN_A9, OUTPUT);
-            digitalWrite(PIN_A9, HIGH);
-            pinMode(16, OUTPUT);
-            digitalWrite(16, HIGH);
-        #elif defined(ARDUINO_NUCLEO_G071RB)
-            // Pin PB6: DB_OUT -> 46
-            // Pin PC10: VCC_OUT -> 16
-            pinMode(46, OUTPUT);
-            digitalWrite(46, HIGH);
-            pinMode(16, OUTPUT);
-            digitalWrite(16, HIGH);
-        #endif
-    #endif
 }
 
 void PDPhy::prepareRead(PDMessage* msg) {

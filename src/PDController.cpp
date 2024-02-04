@@ -14,9 +14,8 @@
 PDController PowerController{};
 
 PDController::PDController()
-: ccPin(0), rxMessageHead(rxBuffer), logHead(0), logTail(0), txMessage((PDMessage*)txBuffer),
-    txMessageId(0), txRetryCount(0), lastRxMessageId(-1), lastSpecRev(1), lastMessage(nullptr),
-    isMonitorOnly(true)
+: ccPin(0), isMonitorOnly(true), eventHandler(nullptr), rxMessageHead(rxBuffer), txMessage((PDMessage*)txBuffer),
+    logHead(0), logTail(0), txMessageId(0), txRetryCount(0), lastRxMessageId(-1), lastSpecRev(1), lastMessage(nullptr)
 {
     PDPhy::prepareRead(reinterpret_cast<PDMessage*>(rxMessageHead));
 }

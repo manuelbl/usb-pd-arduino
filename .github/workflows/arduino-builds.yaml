@@ -11,10 +11,16 @@ jobs:
         include:
           - board: STMicroelectronics:stm32:Nucleo_32
             board_options: pnum=NUCLEO_G431KB
+          - board: STMicroelectronics:stm32:Nucleo_32
+            board_options: pnum=NUCLEO_L432KC
           - board: STMicroelectronics:stm32:Nucleo_64
             board_options: pnum=NUCLEO_G071RB
           - board: STMicroelectronics:stm32:Nucleo_64
             board_options: pnum=NUCLEO_G474RE
+          - board: STMicroelectronics:stm32:GenF1
+            board_options: pnum=BLACKPILL_F103C8
+          - board: STMicroelectronics:stm32:GenF4
+            board_options: pnum=pnum=BLACKPILL_F401CC
 
     steps:
       - name: Checkout

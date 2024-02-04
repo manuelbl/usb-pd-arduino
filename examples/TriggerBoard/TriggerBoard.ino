@@ -21,6 +21,9 @@ void setup() {
   PowerSink.start();
   // request 12V @ 1A once power supply is connected
   PowerSink.requestPower(12000, 1000);
+
+  // Uncomment if using X-NUCLEO-SNK1MK1 shield
+  // NucleoSNK1MK1.init();
 }
 
 void loop() {

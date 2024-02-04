@@ -58,7 +58,7 @@ void TaskScheduler::scheduleTaskAt(TaskFunction task, uint32_t time) {
     if (numScheduledTasks == -1)
         start();
 
-    if (numScheduledTasks >= _countof(scheduledTimes))
+    if (numScheduledTasks >= static_cast<int>(_countof(scheduledTimes)))
         __builtin_trap();
 
     // pause timer

@@ -14,13 +14,18 @@
 #include "USBPowerDelivery.h"
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial)
-    ;
-  Serial.println("USB PD for Arduino - Protocol Analyzer");
-  PowerController.startMonitor();
+    Serial.begin(115200);
+    while (!Serial)
+        ;
+    Serial.println("USB PD for Arduino - Protocol Analyzer");
+
+    PowerController.startMonitor();
+
+    #if defined(SNK1M1_SHIELD)
+        NucleoSNK1MK1.init();
+    #endif
 }
 
 void loop() {
-  PDProtocolAnalyzer.poll();
+    PDProtocolAnalyzer.poll();
 }

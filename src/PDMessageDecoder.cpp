@@ -8,6 +8,7 @@
 
 #include "CRC32.h"
 #include "PDMessageDecoder.h"
+#include <string.h>
 
 
 // sorted from LSB to MSB
@@ -46,7 +47,7 @@ const uint8_t PDMessageDecoder::decode4b5bTab[32] = {
     SymbolError         // 11111
 };
 
-PDMessageDecoder::PDMessageDecoder() : lastValue(0), decodingResult(Result::incomplete) {
+PDMessageDecoder::PDMessageDecoder() : decodingResult(Result::incomplete), lastValue(0) {
     reset();
 }
 
@@ -276,7 +277,8 @@ int PDMessageDecoder::decodeSymbols(const uint16_t* timeStamps, int numTimeStamp
 PDSOPSequence PDMessageDecoder::decodeSOP() {
     PDSOPSequence seq;
 
-    uint32_t symbols = *reinterpret_cast<uint32_t*>(&startSymbols);
+    uint32_t symbols;
+    memcpy(&symbols, startSymbols, sizeof(symbols));
 
     switch (symbols) {
         case combinedSymbols(SymbolSync1, SymbolSync1, SymbolSync1, SymbolSync2):

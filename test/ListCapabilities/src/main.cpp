@@ -22,7 +22,12 @@ void setup() {
     while (!Serial)
         delay(10);
     Serial.println("USB BP for Arduino - List Capabilities");
+
     PowerSink.start(handleEvent);
+
+    #if defined(SNK1M1_SHIELD)
+        NucleoSNK1MK1.init();
+    #endif
 }
 
 void loop() {
