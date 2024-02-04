@@ -20,11 +20,11 @@ jobs:
           - board: STMicroelectronics:stm32:GenF1
             board_options: pnum=BLACKPILL_F103C8
           - board: STMicroelectronics:stm32:GenF4
-            board_options: pnum=pnum=BLACKPILL_F401CC
+            board_options: pnum=BLACKPILL_F401CC
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install arduino-cli
         run: curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
       - name: Install STM32 core
