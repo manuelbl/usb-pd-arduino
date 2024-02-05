@@ -21,42 +21,29 @@
     // STM32G4 family: CC1 -> PB6, CC2 -> PB4
     #define GPIO_CC1 GPIOB
     #define PIN_CC1 LL_GPIO_PIN_6
+    #define ARDUINO_PIN_CC1 PB6
     #define GPIO_CC2 GPIOB
     #define PIN_CC2 LL_GPIO_PIN_4
+    #define ARDUINO_PIN_CC2 PB4
     #define DMA_RX DMA1
     #define DMA_CHANNEL_RX LL_DMA_CHANNEL_1
     #define DMA_TX DMA1
     #define DMA_CHANNEL_TX LL_DMA_CHANNEL_2
     #define UCPD_IRQ UCPD1_IRQn
 
-    #if defined(ARDUINO_NUCLEO_G431KB)
-        #define PIN_CC1_ARDUINO D12
-        #define PIN_CC2_ARDUINO D6
-    #elif defined(ARDUINO_NUCLEO_G431RB) || defined(ARDUINO_NUCLEO_G474RE) || defined(ARDUINO_NUCLEO_G491RE)
-        #define PIN_CC1_ARDUINO D10
-        #define PIN_CC2_ARDUINO D5
-    #else
-    #endif
-
 #elif defined(STM32G0xx)
     // STM32G0 family: CC1 -> PA8, CC2 -> PB15
     #define GPIO_CC1 GPIOA
     #define PIN_CC1 LL_GPIO_PIN_8
+    #define ARDUINO_PIN_CC1 PA8
     #define GPIO_CC2 GPIOB
     #define PIN_CC2 LL_GPIO_PIN_15
+    #define ARDUINO_PIN_CC2 PB15
     #define DMA_RX DMA1
     #define DMA_CHANNEL_RX LL_DMA_CHANNEL_1
     #define DMA_TX DMA1
     #define DMA_CHANNEL_TX LL_DMA_CHANNEL_2
     #define UCPD_IRQ UCPD1_2_IRQn
-
-    #if defined(ARDUINO_NUCLEO_G071RB)
-        #define PIN_CC1_ARDUINO D7
-        #define PIN_CC2_ARDUINO D47
-    #endif
-#endif
-#if !defined(PIN_CC1_ARDUINO) || !defined(PIN_CC2_ARDUINO)
-    #error "Arduiono board not yet supported - please define PIN_CC1_ARDUINO and PIN_CC2_ARDUINO"
 #endif
 
 
@@ -85,8 +72,8 @@ void PDPhySTM32UCPD::init(bool isMonitor) {
 
     // Use Arduino function for basic pin configuration so the Arduino library is aware
     // if the most important settings (such as GPIO clock initialization).
-    pinMode(PIN_CC1_ARDUINO, INPUT_ANALOG);
-    pinMode(PIN_CC2_ARDUINO, INPUT_ANALOG);
+    pinMode(ARDUINO_PIN_CC1, INPUT_ANALOG);
+    pinMode(ARDUINO_PIN_CC2, INPUT_ANALOG);
 
     // initialize UCPD1
     LL_UCPD_InitTypeDef ucpdInit = {};

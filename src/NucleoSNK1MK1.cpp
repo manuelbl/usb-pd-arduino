@@ -15,19 +15,19 @@
 void SNK1MK1Controller::init() {
 
 #if defined(ARDUINO_NUCLEO_G474RE)
-    // Pin PB1: DB_OUT -> PIN_A9
-    // Pin PC10: VCC_OUT -> 16
-    pinMode(PIN_A9, OUTPUT);
-    digitalWrite(PIN_A9, HIGH);
-    pinMode(16, OUTPUT);
-    digitalWrite(16, HIGH);
+    // Pin PB1: DB_OUT
+    // Pin PC10: VCC_OUT
+    pinMode(PB1, OUTPUT);
+    digitalWrite(PB1, HIGH);
+    pinMode(PC10, OUTPUT);
+    digitalWrite(PC10, HIGH);
 #elif defined(ARDUINO_NUCLEO_G071RB)
-    // Pin PB6: DB_OUT -> 46
-    // Pin PC10: VCC_OUT -> 16
-    pinMode(46, OUTPUT);
-    digitalWrite(46, HIGH);
-    pinMode(16, OUTPUT);
-    digitalWrite(16, HIGH);
+    // Pin PB6: DB_OUT
+    // Pin PC10: VCC_OUT
+    pinMode(PB6, OUTPUT);
+    digitalWrite(PB6, HIGH);
+    pinMode(PC10, OUTPUT);
+    digitalWrite(PC10, HIGH);
 #endif
 }
 
