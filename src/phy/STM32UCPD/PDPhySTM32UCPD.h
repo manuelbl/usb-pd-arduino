@@ -17,7 +17,7 @@ extern "C" void UCPD1_2_IRQHandler();
 
 /**
  * @brief Physical layer for USB PD communication.
- * 
+ *
  */
 struct PDPhySTM32UCPD : PDPhy {
 private:

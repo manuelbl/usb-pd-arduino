@@ -17,7 +17,7 @@ extern "C" void DMA1_Channel3_IRQHandler();
 
 /**
  * @brief Physical layer for USB PD communication.
- * 
+ *
  */
 struct PDPhySTM32F1 : PDPhy {
 private:
