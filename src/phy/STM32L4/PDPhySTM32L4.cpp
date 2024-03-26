@@ -10,10 +10,10 @@
 
 #include <Arduino.h>
 #include <string.h>
-#include "CMSISHelper.h"
+#include "phy/CMSISHelper.h"
 #include "PDController.h"
-#include "PDMessageDecoder.h"
-#include "PDMessageEncoder.h"
+#include "phy/PDMessageDecoder.h"
+#include "phy/PDMessageEncoder.h"
 #include "PDPhySTM32L4.h"
 #include "TaskScheduler.h"
 
@@ -179,13 +179,13 @@ void PDPhySTM32L4::initRx() {
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_CRCEN;
     // enable clock for GPIOA, GPIOB and ADC1
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
-    
+
     // wait for clock
     asm("nop");
     asm("nop");
 
     // configure comparator 1
-    COMP1->CSR = 
+    COMP1->CSR =
           (0b10 << COMP_CSR_INPSEL_Pos) // select PA1 as input+
         | COMP_CSR_SCALEN // enable Vrefint scaling
         | COMP_CSR_BRGEN // enable voltage bridge
@@ -207,7 +207,7 @@ void PDPhySTM32L4::initRx() {
     }
 
     // configure comparator 2
-    COMP2->CSR = 
+    COMP2->CSR =
           (0b10 << COMP_CSR_INPSEL_Pos) // select PA3 as input+
         | COMP_CSR_SCALEN // enable Vrefint scaling
         | COMP_CSR_BRGEN // enable voltage bridge
@@ -313,7 +313,7 @@ void PDPhySTM32L4::configureRx(RxConfig config) {
         uint32_t cnt = TIM2->CNT;
         TIM2->CCR2 = (cnt + CC_SAMPLE_INTERVAL) & 0xffff;
         setRegBits(ADC1->CR, ADC_CR_ADSTART, ADC_CR_ADSTART_Msk); // start ADC
-    
+
     } else {
         // disable voltage measurement
         setRegBits(ADC1->CR, ADC_CR_ADSTP, ADC_CR_ADSTP_Msk); // stop ADC
@@ -325,7 +325,7 @@ void PDPhySTM32L4::configureRx(RxConfig config) {
             setRegBits(EXTI->IMR1, EXTI_COMP1, EXTI_COMP1_Msk);
         else
             setRegBits(EXTI->IMR1, EXTI_COMP2, EXTI_COMP2_Msk);
-    
+
     } else {
         // disable COMP interrupt
         clearRegBits(EXTI->IMR1, ccActive == 1 ? EXTI_COMP1_Msk : EXTI_COMP2_Msk);
@@ -478,7 +478,7 @@ void PDPhySTM32L4::processData() {
             hasRxActivity = true;
         }
     }
-    
+
     // check for timeout (a gap without new data)
     int index = BUF_SIZE - DMA1_Channel7->CNDTR;
     uint16_t diff2 = ((uint16_t)TIM2->CNT) - decoder.lastTimeStamp();
@@ -544,7 +544,7 @@ void PDPhySTM32L4::initTx() {
     setRegBits(GPIOA->OTYPER, GPIO_OTYPER_PUSH_PULL(12), GPIO_OTYPER_Msk(12));
     setRegBits(GPIOA->OSPEEDR, GPIO_OSPEEDR_MEDIUM(12), GPIO_OSPEEDR_Msk(12));
     setRegBits(GPIOA->PUPDR, GPIO_PUPDR_NONE(12), GPIO_PUPDR_Msk(12));
-    setRegBits(GPIOA->AFR[1], GPIO_AFRH(12, 5), GPIO_AFRH_Msk(12)); 
+    setRegBits(GPIOA->AFR[1], GPIO_AFRH(12, 5), GPIO_AFRH_Msk(12));
 
     // Configure PB0 as CC1_TX_EN
     gpioSetOutputHigh(GPIOB, 0); // set high (open drain)
@@ -558,7 +558,7 @@ void PDPhySTM32L4::initTx() {
     setRegBits(GPIOB->OTYPER, GPIO_OTYPER_PUSH_PULL(5), GPIO_OTYPER_Msk(5));
     setRegBits(GPIOB->OSPEEDR, GPIO_OSPEEDR_MEDIUM(5), GPIO_OSPEEDR_Msk(5));
     setRegBits(GPIOB->PUPDR, GPIO_PUPDR_NONE(5), GPIO_PUPDR_Msk(5));
-    setRegBits(GPIOB->AFR[0], GPIO_AFRL(5, 5), GPIO_AFRL_Msk(5)); 
+    setRegBits(GPIOB->AFR[0], GPIO_AFRL(5, 5), GPIO_AFRL_Msk(5));
 
     // Configure PB4 as CC2_TX_EN
     gpioSetOutputHigh(GPIOB, 4); // set high (open drain)
@@ -643,9 +643,9 @@ bool PDPhySTM32L4::transmitMessage(const PDMessage* msg) {
         setRegBits(GPIOB->MODER, GPIO_MODER_ALTERNATE(5), GPIO_MODER_Msk(5));
         gpioSetOutputLow(GPIOB, 4); // pull low
     }
-    
+
     setRegBits(SPI1->CR1, SPI_CR1_SPE, SPI_CR1_SPE);
-    
+
     __enable_irq();
     return true;
 }
