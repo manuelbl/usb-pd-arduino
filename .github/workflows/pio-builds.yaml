@@ -22,12 +22,12 @@ jobs:
 
       - name: Build ProtocolAnalyzer
         run: pio run
-        working-directory: ./test/ProtocolAnalyzer
+        working-directory: ./dev/ProtocolAnalyzer
 
       - name: Build ListCapabilities
         run: pio run
-        working-directory: ./test/ListCapabilities
+        working-directory: ./dev/ListCapabilities
 
       - name: Build VoltageChange
         run: pio run
-        working-directory: ./test/VoltageChange
+        working-directory: ./dev/VoltageChange
